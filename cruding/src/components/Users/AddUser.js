@@ -1,111 +1,95 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Card from "../UI/Card";
 import classes from "./AddUser.module.css";
 import Button from "../UI/Button";
+import Wrapper from "../Helpers/Wrappers";
 import ErrorModal from "../UI/ErrorModal";
 
 const AddUser = (props) => {
-  const [enteredUserName, setEnteredUserName] = useState("");
-  const [enteredLastName, setEnteredLastName] = useState("");
-  const [enteredAge, setEnteredAge] = useState("");
-  const [enteredEmail, setEnteredEmail] = useState("");
+  const nameInputRef = useRef();
+  const lastNameInputRef = useRef();
+  const ageInputRef = useRef();
+  const emailInputRef = useRef();
+
   const [error, setError] = useState();
 
   const addUserHandler = (event) => {
+    const enteredName = nameInputRef.current.value;
+    const enteredUserAge = ageInputRef.current.value;
+    const enteredUserEmail = emailInputRef.current.value;
+    const enteredUserLastName = lastNameInputRef.current.value;
     event.preventDefault();
     if (
-      enteredUserName.trim().length === 0 ||
-      enteredAge.trim().length === 0 ||
-      enteredEmail.trim().length === 0 ||
-      enteredLastName.trim().length === 0
+      enteredName.trim().length === 0 ||
+      enteredUserAge.trim().length === 0 ||
+      enteredUserEmail.trim().length === 0 ||
+      enteredUserLastName.trim().length === 0
     ) {
       setError({
-        title: 'მოხდა შეცდომა',
-        message: 'გთხოვთ შეიყვანოთ სწორად მონაცემები და არ დატოვოთ ველები ცარიელი'
+        title: "მოხდა შეცდომა",
+        message:
+          "გთხოვთ შეიყვანოთ სწორად მონაცემები და არ დატოვოთ ველები ცარიელი",
       });
       return;
     }
-    if (+enteredAge < 18) {
+    if (+enteredUserAge < 18) {
       setError({
-        title: 'არასწორი ასაკი',
-        message: '18 წელზე დაბლა მომხმარებლის რეგისტრაცია აკრძალულია'
-      })
+        title: "არასწორი ასაკი",
+        message: "18 წელზე დაბლა მომხმარებლის რეგისტრაცია აკრძალულია",
+      });
       return;
     }
 
-    if (enteredLastName.trim().length < 4) {
+    if (enteredUserLastName.trim().length < 4) {
       setError({
-        title: 'მოხდა შეცდომა',
-        message: 'გვარი უნდა იყოს 4 სიმბოლოზე მეტი'
-      })
+        title: "მოხდა შეცდომა",
+        message: "გვარი უნდა იყოს 4 სიმბოლოზე მეტი",
+      });
       return;
     }
 
-    props.onAddUser(enteredUserName, enteredLastName, enteredEmail, enteredAge);
-
-    setEnteredUserName("");
-    setEnteredAge("");
-    setEnteredLastName("");
-    setEnteredEmail("");
-  };
-
-  const usernameChangeHandler = (event) => {
-    setEnteredUserName(event.target.value);
-  };
-  const lastNameChangeHandler = (event) => {
-    setEnteredLastName(event.target.value);
-  };
-  const emailChangeHandler = (event) => {
-    setEnteredEmail(event.target.value);
-  };
-  const ageChangeHandler = (event) => {
-    setEnteredAge(event.target.value);
+    props.onAddUser(
+      enteredName,
+      enteredUserLastName,
+      enteredUserEmail,
+      enteredUserAge
+    );
+    nameInputRef.current.value = "";
+    lastNameInputRef.current.value = "";
+    emailInputRef.current.value = "";
+    ageInputRef.current.value = "";
   };
 
   const errorHandler = () => {
-    setError(null)
-  }
+    setError(null);
+  };
 
   return (
-    <div>
-     {error && <ErrorModal title={error.title} message={error.message} onConfirm={errorHandler} />}
+    <Wrapper>
+      {error && (
+        <ErrorModal
+          title={error.title}
+          message={error.message}
+          onConfirm={errorHandler}
+        />
+      )}
       <Card className={classes.input}>
         <form onSubmit={addUserHandler}>
           <label htmlFor="username">Username</label>
-          <input
-            id="username"
-            type="text"
-            value={enteredUserName}
-            onChange={usernameChangeHandler}
-          ></input>
+          <input id="username" type="text" ref={nameInputRef}></input>
 
           <label htmlFor="lastname">Lastname</label>
-          <input
-            id="lastname"
-            type="text"
-            value={enteredLastName}
-            onChange={lastNameChangeHandler}
-          ></input>
+          <input id="lastname" type="text" ref={lastNameInputRef}></input>
 
           <label htmlFor="email">email</label>
-          <input
-            id="email"
-            type="email"
-            value={enteredEmail}
-            onChange={emailChangeHandler}
-          ></input>
+          <input id="email" type="email" ref={emailInputRef}></input>
 
           <label htmlFor="age">age(Years)</label>
-          <input
-            id="age"
-            type="number"
-            value={enteredAge}
-            onChange={ageChangeHandler}
-          ></input>
+          <input id="age" type="number" ref={ageInputRef}></input>
           <Button type="submit">Add User</Button>
         </form>
       </Card>
-    </div>
+    </Wrapper>
   );
 };
 
